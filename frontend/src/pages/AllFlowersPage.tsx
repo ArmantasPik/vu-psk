@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import { Header } from "../components/header/Header";
 import { ToastMessage } from "../components/toasts/Toast";
-import { useItems } from "../clients/hook";
+import { useDeleteItem, useItems } from "../clients/hook";
 import { Item } from "../clients/FlowersApiClient";
 import "./AllFlowersPage.scss";
 import { Spinner } from "react-bootstrap";
@@ -10,18 +10,38 @@ import { useNavigate } from "react-router-dom";
 const Items = () => {
     const items = useItems();
     const navigate = useNavigate();
-    return (<>
-        {
-            items.map((item: Item) => {
-                return (
-                    <div className="allflowers-page-body-item">
-                        <span onClick={() => navigate("/all-flowers/" + item.itemId)} style={{cursor: "pointer"}}>{item.itemId}</span>:   {item.name}
-                    </div>
-                );
-            })
-        }
-    </>)
-}
+    const deleteItem = useDeleteItem();
+    return (
+        <table className="allflowers-page-body">
+            <thead>
+                <tr>
+                    <th>Item ID</th>
+                    <th>Name</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {items.map((item) => (
+                    <tr key={item.itemId}>
+                        <td>
+                            <span
+                                onClick={() => navigate("/all-flowers/" + item.itemId)}
+                                style={{ cursor: "pointer" }}
+                            >
+                                {item.itemId}
+                            </span>
+                        </td>
+                        <td>{item.name}</td>
+                        <td style={{ color: "red", cursor: "pointer" }} onClick={() => {
+                            deleteItem.mutate(item.itemId);
+                        }}>X</td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    );
+};
+
 
 export const AllFlowersPage = () => {
     return (
